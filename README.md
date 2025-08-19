@@ -1,0 +1,477 @@
+# 🚀 Modular Chatbot
+
+A modular, scalable chatbot system with agent routing, knowledge retrieval, and mathematical computation capabilities. Built with FastAPI, LangChain, and modern software engineering practices.
+
+## 📋 Table of Contents
+
+- [🎯 Features](#-features)
+- [🏗️ Architecture](#️-architecture)
+- [🚀 Quick Start](#-quick-start)
+- [📡 API Documentation](#-api-documentation)
+- [🧪 Testing](#-testing)
+- [🔧 Configuration](#-configuration)
+- [📊 Observability](#-observability)
+- [🔐 Security](#-security)
+- [🐳 Docker & Kubernetes](#-docker--kubernetes)
+- [🖥️ Local Ops & DB (pgAdmin)](#️-local-ops--db-pgadmin)
+- [📝 Example Usage](#-example-usage)
+- [🔮 Future Enhancements](#-future-enhancements)
+- [🤝 Contributing](#-contributing)
+
+## 🎯 Features
+
+- **🤖 Agent Routing**: Intelligent routing between KnowledgeAgent and MathAgent
+- **📚 RAG Integration**: Retrieval-Augmented Generation using InfinitePay help content
+- **🧮 Math Processing**: LLM-powered mathematical expression interpretation
+- **💬 Modern Chat Interface**: React-based frontend with real-time messaging
+- **🔄 Multi-Conversation Support**: Manage multiple chat conversations
+- **🎨 Agent Visualization**: See which AI agent handled each response
+- **🔍 Structured Logging**: Comprehensive observability with JSON logs
+- **🛡️ Security**: Input sanitization and prompt injection prevention
+- **📊 Health Monitoring**: Built-in health checks and readiness probes
+- **🐳 Containerized**: Docker and Kubernetes ready
+- **🧪 Tested**: Comprehensive test suite with pytest
+
+## 🏗️ Architecture
+
+### Core Components
+
+1. **RouterAgent**: Decides which specialized agent should handle user messages
+2. **KnowledgeAgent**: Handles questions using RAG from InfinitePay help content
+3. **MathAgent**: Processes mathematical expressions and calculations
+4. **Database Layer**: SQLAlchemy ORM with conversation and message tracking
+5. **API Layer**: FastAPI with comprehensive validation and error handling
+
+### Technology Stack
+
+- **Backend**: FastAPI, Python 3.11
+- **Frontend**: Next.js 14, React, TypeScript, Tailwind CSS
+- **AI/LLM**: LangChain, Groq API
+- **Database**: SQLite (development), PostgreSQL (production ready)
+- **Caching**: Redis (configured for future use)
+- **Containerization**: Docker, Docker Compose
+- **Testing**: pytest, httpx
+- **Logging**: structlog, JSON formatting
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Python 3.11+
+- Node.js 18+ (for frontend development)
+- Docker and Docker Compose
+- Groq API key
+
+### Local Development
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd ModularChatBot
+   ```
+
+2. **Set up environment variables**
+   ```bash
+   # Create .env file in project root
+   cp .env.example .env
+   
+   # Edit .env and add your Groq API key
+   GROQ_API_KEY=your_groq_api_key_here
+   
+   # IMPORTANT: Use a PostgreSQL DSN in production and for Docker
+   # Example (Docker Compose network):
+   DATABASE_URL=postgres+psycopg://postgres:password@db:5432/chatbot
+   
+   # Example (local host)
+   # DATABASE_URL=postgres+psycopg://postgres:password@localhost:5432/chatbot
+   ```
+
+3. **Run with Docker Compose**
+   ```bash
+   # From project root
+   docker-compose up --build
+   ```
+
+4. **Access the application**
+   - Frontend: http://localhost:3000
+   - API: http://localhost:8000
+   - Documentation: http://localhost:8000/docs
+   - Health Check: http://localhost:8000/health
+   - PostgreSQL: localhost:5432 (user: postgres, password: password)
+   - Redis: localhost:6379
+
+5. **Frontend (production build optional)**
+   ```bash
+   cd frontend
+   npm run build
+   npm run start
+   ```
+
+### Manual Setup
+
+#### Backend Setup
+
+1. **Install dependencies**
+   ```bash
+   cd backend
+   pip install -r requirements.txt
+   ```
+
+2. **Run the backend**
+   ```bash
+   uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+   ```
+
+#### Frontend Setup
+
+1. **Install dependencies**
+   ```bash
+   cd frontend
+   npm install
+   ```
+
+2. **Create environment file**
+   ```bash
+   # Create .env.local file
+   echo "NEXT_PUBLIC_API_URL=http://localhost:8000" > .env.local
+   ```
+
+3. **Run the frontend**
+   ```bash
+   npm run dev
+   ```
+
+   Or run an optimized build locally:
+   ```bash
+   npm run build
+   npm run start
+   ```
+
+4. **Access the frontend**
+   - Open http://localhost:3000 in your browser
+
+## 📡 API Documentation
+
+### Main Chat Endpoint
+
+**POST** `/chat/`
+
+Send a message to the chatbot:
+
+```bash
+curl -X POST "http://localhost:8000/chat/" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "message": "What are the card machine fees?",
+    "user_id": "client789",
+    "conversation_id": "conv-1234"
+  }'
+```
+
+**Response:**
+```json
+{
+  "response": "Here is the answer with personality.",
+  "source_agent_response": "Text generated by the specialized agent.",
+  "agent_workflow": [
+    {
+      "agent": "RouterAgent",
+      "decision": "KnowledgeAgent",
+      "execution_time": 150
+    },
+    {
+      "agent": "KnowledgeAgent",
+      "execution_time": 1200
+    }
+  ],
+  "conversation_id": "conv-1234",
+  "execution_time": 1350,
+  "timestamp": "2025-08-07T14:32:12Z"
+}
+```
+
+### Other Endpoints
+
+- **GET** `/health/` - Basic health check
+- **GET** `/health/detailed` - Detailed system health
+- **GET** `/health/ready` - Kubernetes readiness probe
+- **GET** `/conversations/{conversation_id}` - Get conversation
+- **GET** `/messages/conversation/{conversation_id}` - Get conversation messages
+
+## 🧪 Testing
+
+### Run Tests
+
+```bash
+cd backend
+pytest tests/ -v
+```
+
+### Test Coverage
+
+```bash
+pytest tests/ --cov=app --cov-report=html
+```
+
+### Example Test Messages
+
+```bash
+# Knowledge question
+curl -X POST "http://localhost:8000/chat/" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "message": "What are the card machine fees?",
+    "user_id": "test_user",
+    "conversation_id": "test_conv"
+  }'
+
+# Math question
+curl -X POST "http://localhost:8000/chat/" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "message": "How much is 65 x 3.11?",
+    "user_id": "test_user",
+    "conversation_id": "test_conv"
+  }'
+```
+
+## 🔧 Configuration
+
+### Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `GROQ_API_KEY` | Groq API key (required) | - |
+| `GROQ_MODEL` | LLM model to use | `llama3-70b-8192` |
+| `DATABASE_URL` | Database connection string | `postgres+psycopg://postgres:password@db:5432/chatbot` |
+| `LOG_LEVEL` | Logging level | `INFO` |
+| `LOG_FORMAT` | Log format (json/standard) | `json` |
+| `DEBUG` | Debug mode | `True` |
+
+Notes:
+- This project expects a PostgreSQL DSN using the `postgres+psycopg` driver (not SQLite) in Docker and production. An example is provided in `.env.example`.
+- You can still run SQLite for quick local experiments by setting `DATABASE_URL=sqlite:///./chatbot.db`, but tests and Docker default to PostgreSQL.
+
+### Configuration Files
+
+- `.env` - Environment variables
+- `backend/app/config.py` - Configuration management
+- `docker-compose.yml` - Service orchestration
+- `nginx.conf` - Reverse proxy configuration
+- `init.sql` - PostgreSQL initialization script
+
+## 📊 Observability
+
+### Structured Logging
+
+All logs are structured JSON with the following fields:
+
+```json
+{
+  "timestamp": "2025-08-07T14:32:12Z",
+  "level": "INFO",
+  "agent": "RouterAgent",
+  "conversation_id": "conv-1234",
+  "user_id": "client789",
+  "execution_time": 150,
+  "decision": "KnowledgeAgent"
+}
+```
+
+Additional example (response log):
+```json
+{
+  "timestamp": "2025-08-07T14:32:13Z",
+  "level": "INFO",
+  "event": "chat.response",
+  "conversation_id": "conv-1234",
+  "user_id": "client789",
+  "source_agent": "KnowledgeAgent",
+  "tokens_prompt": 845,
+  "tokens_completion": 128,
+  "latency_ms": 1350
+}
+```
+
+### Health Monitoring
+
+- **Basic Health**: `/health/`
+- **Detailed Health**: `/health/detailed`
+- **Readiness Probe**: `/health/ready`
+
+### Metrics
+
+- Execution times for each agent
+- Agent routing decisions
+- Error rates and types
+- Database connection health
+
+## 🔐 Security
+
+### Input Sanitization
+
+- HTML tag, control-char, and non-printable removal
+- Script and template injection prevention
+- XSS protection (escaping, no HTML rendering of user input)
+- SQL injection prevention (ORM-bound params)
+- Max length limits and rate limiting hooks
+
+### Prompt Injection Prevention
+
+- Language/encoding validation
+- Suspicious instruction pattern blocking
+- Tool/agent scope whitelisting
+- Input length limits and stop-sequence enforcement
+- Content filtering (basic policy checks)
+
+### Error Handling
+
+- No raw exceptions exposed to clients
+- Structured error responses
+- Comprehensive logging
+- Graceful degradation
+
+## 🐳 Docker & Kubernetes
+
+### Docker Compose
+
+```bash
+# Development
+docker-compose up
+
+# Production (with nginx)
+docker-compose --profile production up
+```
+
+### Kubernetes Deployment
+
+```bash
+# Apply all Kubernetes manifests
+kubectl apply -f k8s/
+
+# Check deployment status
+kubectl get pods -n chatbot
+kubectl get services -n chatbot
+```
+
+### Kubernetes Manifests
+
+The `k8s/` directory contains:
+- `deployment.yaml` - Backend deployment
+- `service.yaml` - Service definitions
+- `ingress.yaml` - Ingress configuration
+- `configmap.yaml` - Configuration
+- `secret.yaml` - Secrets template
+
+## 🖥️ Local Ops & DB (pgAdmin)
+
+If you prefer a GUI to inspect PostgreSQL locally, you can use pgAdmin:
+
+1. Install pgAdmin (or use the `dpage/pgadmin4` Docker image).
+2. Connect to the database using:
+   - Host: `localhost` (or `db` from inside Docker network)
+   - Port: `5432`
+   - Username: `postgres`
+   - Password: `password`
+   - Database: `chatbot`
+3. You can run the `init.sql` at the project root to create schemas if needed.
+
+Accessing the app locally:
+- Frontend: http://localhost:3000
+- API Docs: http://localhost:8000/docs
+- Health: http://localhost:8000/health
+
+To test multiple conversations in the frontend, open multiple browser tabs and start chats with different `conversation_id` values; the backend will keep histories separate and the UI will render distinct message threads.
+
+## 📝 Example Usage
+
+### Multiple Conversations
+
+```bash
+# Conversation 1 - Knowledge questions
+curl -X POST "http://localhost:8000/chat/" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "message": "Can I use my phone as a card machine?",
+    "user_id": "client789",
+    "conversation_id": "conv-help"
+  }'
+
+# Conversation 2 - Math calculations
+curl -X POST "http://localhost:8000/chat/" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "message": "Calculate (42 * 2) / 6",
+    "user_id": "client789",
+    "conversation_id": "conv-calc"
+  }'
+```
+
+### Agent Workflow Tracking
+
+Each response includes detailed workflow information:
+
+```json
+{
+  "agent_workflow": [
+    {
+      "agent": "RouterAgent",
+      "decision": "KnowledgeAgent",
+      "execution_time": 150,
+      "method": "rule_based"
+    },
+    {
+      "agent": "KnowledgeAgent",
+      "execution_time": 1200,
+      "sources": ["https://ajuda.infinitepay.io/pt-BR/"]
+    }
+  ]
+}
+```
+
+You can also fetch a conversation and its messages to rebuild history in the UI:
+```bash
+curl http://localhost:8000/conversations/conv-1234
+curl http://localhost:8000/messages/conversation/conv-1234
+```
+
+The frontend can reconstruct a conversation window by loading messages by `conversation_id` and rendering them in order.
+
+## 🔮 Future Enhancements
+
+- Recursive URL crawling for KnowledgeAgent to build deeper, site-wide context graphs and richer embeddings beyond single-page fetches.
+- Long-term memory for chats leveraging conversation/message records to prime agent context and improve continuity across sessions.
+- Frontend conversation history UI: list past conversations by `conversation_id`, quick switcher, and searchable transcripts.
+- Production hardening: finalize Kubernetes manifests, CI/CD to a cloud provider, secrets management, autoscaling, and observability dashboards.
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests
+5. Run the test suite
+6. Submit a pull request
+
+### Development Guidelines
+
+- Follow PEP 8 style guidelines
+- Add type hints to all functions
+- Write comprehensive docstrings
+- Include tests for new features
+- Update documentation as needed
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 🆘 Support
+
+For support and questions:
+- Create an issue in the repository
+- Check the API documentation at `/docs`
+- Review the health endpoints for system status
+
+---
+
+**Built with ❤️ using FastAPI, LangChain, and modern software engineering practices.**
