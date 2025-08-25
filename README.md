@@ -239,18 +239,56 @@ curl -X POST "http://localhost:8000/chat/" \
 
 ### Environment Variables
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `GROQ_API_KEY` | Groq API key (required) | - |
-| `GROQ_MODEL` | LLM model to use | `llama3-70b-8192` |
-| `DATABASE_URL` | Database connection string | `postgres+psycopg://postgres:password@db:5432/chatbot` |
-| `LOG_LEVEL` | Logging level | `INFO` |
-| `LOG_FORMAT` | Log format (json/standard) | `json` |
-| `DEBUG` | Debug mode | `True` |
+#### Backend Configuration (from `backend/app/config.py`)
 
-Notes:
-- This project expects a PostgreSQL DSN using the `postgres+psycopg` driver (not SQLite) in Docker and production. An example is provided in `.env.example`.
-- You can still run SQLite for quick local experiments by setting `DATABASE_URL=sqlite:///./chatbot.db`, but tests and Docker default to PostgreSQL.
+| Variable | Description | Default | Required |
+|----------|-------------|---------|----------|
+| `GROQ_API_KEY` | Groq API key | - | **Yes** |
+| `GROQ_MODEL` | LLM model to use | `llama3-70b-8192` | No |
+| `DATABASE_URL` | Database connection string | `sqlite:///./chatbot.db` | No |
+| `TEST_DATABASE_URL` | Test database connection | `sqlite:///./test_chatbot.db` | No |
+| `REDIS_URL` | Redis connection string | `redis://localhost:6379` | No |
+| `REDIS_DB` | Redis database number | `0` | No |
+| `SECRET_KEY` | JWT secret key | `your-secret-key-here-change-in-production` | No |
+| `ALGORITHM` | JWT algorithm | `HS256` | No |
+| `ACCESS_TOKEN_EXPIRE_MINUTES` | JWT token expiry | `30` | No |
+| `LOG_LEVEL` | Logging level | `INFO` | No |
+| `LOG_FORMAT` | Log format (json/standard) | `json` | No |
+| `DEBUG` | Debug mode | `True` | No |
+| `ENVIRONMENT` | Environment name | `development` | No |
+| `HOST` | Server host | `0.0.0.0` | No |
+| `PORT` | Server port | `8000` | No |
+| `APP_NAME` | Application name | `ModularChatBot` | No |
+| `INFINITEPAY_HELP_URL` | Help content URL | `https://ajuda.infinitepay.io/pt-BR/` | No |
+
+#### Frontend Configuration
+
+| Variable | Description | Default | Required |
+|----------|-------------|---------|----------|
+| `NEXT_PUBLIC_API_URL` | Backend API URL | `http://localhost:8000` | No |
+
+#### PostgreSQL Configuration (Docker Compose)
+
+| Variable | Description | Default | Required |
+|----------|-------------|---------|----------|
+| `POSTGRES_DB` | Database name | `chatbot` | No |
+| `POSTGRES_USER` | Database user | `postgres` | No |
+| `POSTGRES_PASSWORD` | Database password | `password` | No |
+| `POSTGRES_INITDB_ARGS` | PostgreSQL init args | `--encoding=UTF-8 --lc-collate=C --lc-ctype=C` | No |
+
+**Required Environment Variables:**
+- `GROQ_API_KEY`: Your Groq API key (get from https://console.groq.com/)
+
+**Database Configuration:**
+- For Docker Compose: `DATABASE_URL=postgres+psycopg://postgres:password@db:5432/chatbot`
+- For local PostgreSQL: `DATABASE_URL=postgres+psycopg://postgres:password@localhost:5432/chatbot`
+- For SQLite testing: `DATABASE_URL=sqlite:///./chatbot.db`
+
+**Security Notes:**
+- Change `SECRET_KEY` in production
+- Set `DEBUG=False` in production
+- Use strong `SECRET_KEY` values
+- Change PostgreSQL credentials in production
 
 ### Configuration Files
 
