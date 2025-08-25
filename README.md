@@ -78,12 +78,12 @@ A modular, scalable chatbot system with agent routing, knowledge retrieval, and 
    # Edit .env and add your Groq API key
    GROQ_API_KEY=your_groq_api_key_here
    
-   # IMPORTANT: Use a PostgreSQL DSN in production and for Docker
-   # Example (Docker Compose network):
-   DATABASE_URL=postgres+psycopg://postgres:password@db:5432/chatbot
-   
-   # Example (local host)
-   # DATABASE_URL=postgres+psycopg://postgres:password@localhost:5432/chatbot
+       # IMPORTANT: Use a PostgreSQL DSN in production and for Docker
+    # Example (Docker Compose network):
+    DATABASE_URL=postgresql+psycopg2://postgres:password@db:5432/chatbot
+    
+    # Example (local host)
+    # DATABASE_URL=postgresql+psycopg2://postgres:password@localhost:5432/chatbot
    ```
 
 3. **Run with Docker Compose**
@@ -280,8 +280,8 @@ curl -X POST "http://localhost:8000/chat/" \
 - `GROQ_API_KEY`: Your Groq API key (get from https://console.groq.com/)
 
 **Database Configuration:**
-- For Docker Compose: `DATABASE_URL=postgres+psycopg://postgres:password@db:5432/chatbot`
-- For local PostgreSQL: `DATABASE_URL=postgres+psycopg://postgres:password@localhost:5432/chatbot`
+- For Docker Compose: `DATABASE_URL=postgresql+psycopg2://postgres:password@db:5432/chatbot`
+- For local PostgreSQL: `DATABASE_URL=postgresql+psycopg2://postgres:password@localhost:5432/chatbot`
 - For SQLite testing: `DATABASE_URL=sqlite:///./chatbot.db`
 
 **Security Notes:**
